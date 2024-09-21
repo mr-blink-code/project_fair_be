@@ -1,4 +1,5 @@
 const users = require('../Models/userCollection')
+const jwt = require('jsonwebtoken')
 exports.register= async(req,res)=>{
     //console.log(req.body)
     const {username,email,password}=req.body;
@@ -28,6 +29,28 @@ exports.register= async(req,res)=>{
     }
     
 }
+
+exports.login= async(req,res)=>{
+
+    const {email,password}=req.body;
+    //check email id avilable or not
+    try{
+        const existingUser= await users.findOne({email:email,password:password});
+        if(existingUser){
+            const token = jwt.sign({userId:existingUser._id},"bbroygbhvw2024");
+            console.log("token")
+           res.status(200).json({data:existingUser,token:token})
+        }
+        else{
+            res.status(401).json("Invalid email or password")
+            }
+    }
+    catch(err){
+            res.status(501).json("internal server error",err)
+    }
+    
+}
+
 
 exports.getUserDetail=(req,res)=>{
     res.status(200).json("inside get user details")
