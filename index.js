@@ -1,3 +1,5 @@
+//const appMiddleware = require('./Middlewares/appMiddleware')
+
 const router = require('./Router/router')
 require('dotenv').config() // import dot env module
 
@@ -9,10 +11,11 @@ pfServer.use(cors()) //inject cors into pfserver
 
 //use middle ware to convert Json data to js object
 pfServer.use(express.json())
+//pfServer.use(appMiddleware)
 pfServer.use(router)
 
 // provide PORT 
-const PORT = 4000;
+const PORT = 4001;
 
 pfServer.listen(PORT,()=>{
     console.log(`pfsever is running in PORT ${PORT}`)

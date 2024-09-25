@@ -38,7 +38,7 @@ exports.login= async(req,res)=>{
         const existingUser= await users.findOne({email:email,password:password});
         if(existingUser){
             const token = jwt.sign({userId:existingUser._id},"bbroygbhvw2024");
-            console.log("token")
+            console.log(token)
            res.status(200).json({data:existingUser,token:token})
         }
         else{
