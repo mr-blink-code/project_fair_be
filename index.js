@@ -17,6 +17,9 @@ pfServer.use(router)
 // provide PORT 
 const PORT = 4001;
 
+//to expose upload folder
+pfServer.use('/uploads/',express.static('./uploads'))
+
 pfServer.listen(PORT,()=>{
     console.log(`pfsever is running in PORT ${PORT}`)
 })

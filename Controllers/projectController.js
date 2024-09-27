@@ -26,5 +26,36 @@ exports.addproject = async (req, res) => {
     }
   } catch (err) {
     res.status(401).json("project upload failed");
+}
+  //1.get any  3 projects details form home page
+}
+  exports.getHomeProject = async (req, res)=>{
+    try{
+      const homeProject = await projects.find().limit(3);
+      res.status(200).json(homeProject)
+    }
+    catch(err){
+      res.send(401).json("Requestfailed due to error",err)
+    }
   }
-};
+  //get all projects
+  exports.getAllProject = async (req, res)=>{
+    try{
+      const allProject = await projects.find();
+      res.status(200).json(allProject)
+    }
+    catch(err){
+      res.send(401).json("Requestfailed due to error",err)
+    }
+  }
+
+  // get all projects uploded by that specific user
+  exports.getUserProject = async (req, res)=>{
+    try{
+      const alluserProject = await projects.find({userId:userId});
+      res.status(200).json(alluserProject)
+    }
+    catch(err){
+      res.send(401).json("Requestfailed due to error",err)
+    }
+  }
