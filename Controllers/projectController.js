@@ -1,11 +1,9 @@
 const projects = require("../Models/projectCollection");
 
+ /*ADD PROJECT */
 exports.addproject = async (req, res) => {
-  console.log("inside add project");
   const userId = req.payload;
-  console.log("userId:-", userId);
   const projectImage = req.file.filename;
-  console.log("inage file name", projectImage);
   const { title, language, github, website, overview } = req.body;
   try {
     const exixtingProjects = await projects.findOne({ github: github });
@@ -27,11 +25,37 @@ exports.addproject = async (req, res) => {
   } catch (err) {
     res.status(401).json("project upload failed");
 }
-  //1.get any  3 projects details form home page
+ 
 }
+/*DELETE PROJECT*/
+
+exports.deleteProject = async (req,res) => {
+  console.log("welcoem inside dele")
+  const projectId = req.params.id;
+  const userId = req.payload; //fetch user id from payload
+  console.log(userId)
+  console.log(projectId)
+
+  try{
+    const project = await projects.findByIdAndDelete({_id:projectId,userId:userId});
+
+    if(!project){
+      return res.status(404).json("Project not found or you do not have permission to delete this project.")
+    }
+    await projects.deleteOne({_id:projectId});
+
+    res.status(200).json("Project delete successfully");
+  }catch(err){
+    console.error(err);
+    res.status(500).json("Error deleting project");
+  }
+};
+
+/*FETCH PROECT*/
+
   exports.getHomeProject = async (req, res)=>{
     try{
-      const homeProject = await projects.find().limit(3);
+      const homeProject = await projects.find().limit(5);
       res.status(200).json(homeProject)
     }
     catch(err){
@@ -40,8 +64,16 @@ exports.addproject = async (req, res) => {
   }
   //get all projects
   exports.getAllProject = async (req, res)=>{
+    const searchKey = req.query.search;
+    const searchQuery ={
+      $or:[
+            {language:{$regex:searchKey,$options:'i'}},
+            {title:{$regex:searchKey,$options:'i'}}
+          ]
+    }
+    
     try{
-      const allProject = await projects.find();
+      const allProject = await projects.find(searchQuery);
       res.status(200).json(allProject)
     }
     catch(err){
@@ -51,11 +83,44 @@ exports.addproject = async (req, res) => {
 
   // get all projects uploded by that specific user
   exports.getUserProject = async (req, res)=>{
+    const userId=req.payload;
     try{
-      const alluserProject = await projects.find({userId:userId});
-      res.status(200).json(alluserProject)
+      const userProjects = await projects.find({userId:userId});
+      res.status(200).json(userProjects)
     }
     catch(err){
-      res.send(401).json("Requestfailed due to error",err)
+      res.send(401).json("Request failed due to error",err)
     }
   }
+   //EDIT USER PROJECT
+
+   exports.editUserProject = async (req,res)=>{
+    console.log("Welcome its inside edit User section")
+    console.log(req)
+    const projectId= req.params.id;
+    const userId = req.payload;
+    const {title,language,github,website,overview,projectImage}=req.body;
+    const uploadProjectImage=req.file?req.file.filename:projectImage;
+    try{
+      const updateProject = await projects.findByIdAndUpdate(
+        {_id:projectId},
+        {
+          title:title,
+          language:language,
+          github:github,
+          website:website,
+          overview:overview,
+          projectImage:uploadProjectImage,
+          userId:userId
+        },
+        {
+          new:true,
+        }
+      )
+      await updateProject.save();
+      res.status(200).json(updateProject)
+    }
+    catch(error){
+      res.status(401).json(error)
+    }
+   }

@@ -18,13 +18,13 @@ const projectCollection=new mongoose.Schema({
     projectImage:{
         type:String,require:true
     },
-    language:{
+    language:[{
         type:String,require:true
-    },
+    }],
     userId:{
         type:String,require:true
     }
-})
+},{timestamps:true});
 
 //create model
 //mongoose.model() method is used to create, it accepts two arguments
